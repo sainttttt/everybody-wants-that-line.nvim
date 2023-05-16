@@ -27,7 +27,7 @@ function M.get_buf_modflag()
 	local buftype = vim.o.buftype
 	local flag
 	if is_modifiable then
-		flag = CE.get_plus("100")
+		flag = "%#Search#% + MOD +"
 	elseif not is_modifiable then
 		if buftype == "" then
 			flag = " "

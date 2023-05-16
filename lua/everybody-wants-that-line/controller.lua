@@ -38,7 +38,8 @@ function M.get_buffer()
 	local buffer = ""
 	if S.opt.buffer.enabled == true then
 		local bufnr_item = CB.get_buf_nr(S.opt.buffer)
-		buffer = CB.get_buffer_symbol(S.opt.buffer.prefix) .. bufnr_item.result .. CB.get_buf_modflag()
+		-- buffer = CB.get_buffer_symbol(S.opt.buffer.prefix) .. CB.get_buf_modflag()
+		buffer = CB.get_buf_modflag()
 	end
 	return buffer
 end
@@ -143,25 +144,36 @@ end
 ---Returns path to the file
 ---@return string
 function M.get_filepath()
+
 	local result = ""
 	if S.opt.filepath.enabled == true then
 		local path_parts = CP.get_filepath(vim.api.nvim_get_current_buf())
 		result = "[No name]"
 		if #path_parts.relative.path ~= 0 and #path_parts.full.path ~= 0 then
-			local filename = M.bold(path_parts.relative.filename)
+			local filename = path_parts.relative.filename
 			if S.opt.filepath.path == "tail" then
 				result = filename
 			elseif S.opt.filepath.path == "relative" then
 				local relative = S.opt.filepath.shorten and path_parts.relative.shorten or path_parts.relative.path
-				result = UC.highlight_text(relative, C.group_names.fg_60) .. filename
+				result = filename
 			elseif S.opt.filepath.path == "full" then
 				local full = S.opt.filepath.shorten and path_parts.full.shorten or path_parts.full.path
-				result = UC.highlight_text(full, C.group_names.fg_60) .. filename
+				result = filename
 			end
 		end
+    print("meow")
+    print(result)
 		result = CE.el.truncate .. result
 	end
-	return result
+
+	local bufnr = UU.get_bufnr()
+	local is_modifiable = vim.api.nvim_buf_get_option(bufnr, "mod") --[[@as boolean]]
+
+	if is_modifiable then
+    return "%#CurSearch#" .. result
+  else
+    return result
+  end
 end
 
 ---Returns netrw directory

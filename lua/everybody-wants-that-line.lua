@@ -1,6 +1,8 @@
 local CE = require("everybody-wants-that-line.components.elements")
 local CO = require("everybody-wants-that-line.controller")
 local UU = require("everybody-wants-that-line.utils.util")
+local UC = require("everybody-wants-that-line.utils.color")
+local C = require("everybody-wants-that-line.colors")
 
 local M = {}
 
@@ -25,17 +27,21 @@ function M._set_statusline()
 	---@type string[]
 	local components
 
+	local is_focused = UU.is_focused()
 	-- NORMAL
 	if wintype == "normal" then
 		components = {
-			CO.get_buffer(),
-			CO.get_diagnostics(),
+			-- CO.get_buffer(),
+      -- UC.highlight_text(CO.get_buffer(), C.group_names["fg_diff_delete_bold"]),
+      -- CO.get_buffer(),
+			-- CO.get_diagnostics(),
 			CO.get_quickfix(),
-			CE.spaced_text(UU.join({
-				CO.title(CO.get_branch_name()),
-				CO.get_branch_status(),
-				CO.get_filepath(),
-			}, CE.el.space)),
+      CO.get_filepath(),
+			-- CE.spaced_text(UU.join({
+			-- 	CO.title(CO.get_branch_name()),
+			-- 	CO.get_branch_status(),
+			-- 	CO.get_filepath(),
+			-- }, CE.el.space)),
 			CO.get_filesize(),
 			CO.get_ruller(true, true, true),
 		}
