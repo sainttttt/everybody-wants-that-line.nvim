@@ -161,8 +161,8 @@ function M.get_filepath()
 				result = filename
 			end
 		end
-    print("meow")
-    print(result)
+    -- print("meow")
+    -- print(result)
 		result = CE.el.truncate .. result
 	end
 
@@ -312,6 +312,8 @@ local function setup_autocmd(cb)
 	-- file name
 	create_autocmd({
 		"BufWinEnter",
+    "TextChanged",
+    "TextChangedI",
 		"VimResized",
 		"WinClosed",
 		"WinLeave",

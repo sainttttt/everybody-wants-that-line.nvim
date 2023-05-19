@@ -40,6 +40,43 @@ local function get_config(win_id, filename)
 	return config
 end
 
+
+local function update_float(float_win_id)
+
+  print('updating float')
+	local bufnr = UU.get_bufnr()
+	local is_modifiable = vim.api.nvim_buf_get_option(bufnr, "mod") --[[@as boolean]]
+  print(float_win_id)
+
+  if is_modifiable then
+    local cat = vim.api.nvim_create_namespace("cat")
+    -- local cat = 0
+    -- vim.api.nvim_set_hl_ns(cat)
+    -- vim.api.nvim_set_hl(cat, "StatusLineNC", { ctermbg = 3, ctermfg = 4})
+    -- vim.api.nvim_set_hl(cat, "StatusLine", { ctermbg = 3, ctermfg = 4})
+    vim.api.nvim_set_hl(cat, "Pmenu", { ctermbg = 1})
+    -- vim.api.nvim_set_hl(cat, "PmenuSel", { ctermbg = 3, ctermfg = 4})
+    -- vim.api.nvim_set_hl(cat, "NonText", { ctermbg = 3, ctermfg = 4})
+    -- vim.api.nvim_set_hl(cat, "TabLine", { ctermbg = 3, ctermfg = 4})
+    -- vim.api.nvim_set_hl(0, "Visual", { ctermbg = 8, ctermfg = 3})
+    vim.api.nvim_win_set_hl_ns(float_win_id, cat)
+  else
+    local cat = vim.api.nvim_create_namespace("cat")
+    -- local cat = 0
+    -- vim.api.nvim_set_hl_ns(cat)
+    vim.api.nvim_win_set_hl_ns(float_win_id, cat)
+    -- vim.api.nvim_set_hl(cat, "StatusLineNC", { ctermbg = 3, ctermfg = 4})
+    -- vim.api.nvim_set_hl(cat, "StatusLine", { ctermbg = 3, ctermfg = 4})
+    vim.api.nvim_set_hl(cat, "Pmenu", { ctermbg = 8})
+    -- vim.api.nvim_set_hl(cat, "PmenuSel", { ctermbg = 3, ctermfg = 4})
+    -- vim.api.nvim_set_hl(cat, "NonText", { ctermbg = 3, ctermfg = 4})
+    -- vim.api.nvim_set_hl(cat, "TabLine", { ctermbg = 3, ctermfg = 4})
+    -- vim.api.nvim_set_hl(0, "Visual", { ctermbg = 8, ctermfg = 3})
+    print(cat)
+    print("wooof")
+  end
+
+end
 ---Creates new floating window
 ---@param win_id number
 ---@param filename string
@@ -52,6 +89,7 @@ local function create_float(win_id, filename)
 	local content = CE.with_offset(filename)
 	vim.api.nvim_buf_set_lines(buf_id, 0, 1, false, { string.rep(" ", #content), content })
 	local float_win_id = vim.api.nvim_open_win(buf_id, false, config)
+
 	cache[win_id] = {
 		win_id = win_id,
 		float_win_id = float_win_id,
@@ -102,7 +140,18 @@ end
 ---@param curwin_id number
 ---@param win_id number
 local function highlight_float(curwin_id, win_id)
-	local hlgroup = C.group_names[curwin_id == win_id and "fg_bold" or "fg_60_bold"]
+
+  if cache[curwin_id] == nil then
+    return
+  end
+	local bufnr = cache[win_id].buf_id
+	local is_modifiable = vim.api.nvim_buf_get_option(bufnr, "mod") --[[@as boolean]]
+
+  local hlgroup = C.group_names[curwin_id == win_id and "fg_bold" or "fg_60_bold"]
+  if is_modifiable then
+    hlgroup = "CurSearch"
+  end
+
 	vim.api.nvim_buf_clear_namespace(cache[win_id].float_buf_id, ns_id, 0, -1)
 	vim.api.nvim_buf_add_highlight(cache[win_id].float_buf_id, ns_id, hlgroup, 0, 0, #cache[win_id].filename + 2)
 	vim.api.nvim_buf_add_highlight(cache[win_id].float_buf_id, ns_id, hlgroup, 1, 0, #cache[win_id].filename + 2)
@@ -129,6 +178,10 @@ function M.set_filename(args)
 					create_float(curwin_id, filepath.full.filename)
 				end
 			end
+    else
+
+    -- update_float(cache[curwin_id].float_win_id)
+
 		end
 		for _, win_id in ipairs(win_ids) do
 			if cache[win_id] ~= nil and UU.is_win_valid(win_id) then
