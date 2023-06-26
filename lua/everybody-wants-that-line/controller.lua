@@ -149,21 +149,23 @@ function M.get_filepath()
 	if S.opt.filepath.enabled == true then
 		local path_parts = CP.get_filepath(vim.api.nvim_get_current_buf())
 		result = "[No name]"
+    print("meow")
+    print(dump(S.opt.filepath.path))
 		if #path_parts.relative.path ~= 0 and #path_parts.full.path ~= 0 then
 			local filename = path_parts.relative.filename
 			if S.opt.filepath.path == "tail" then
 				result = filename
 			elseif S.opt.filepath.path == "relative" then
 				local relative = S.opt.filepath.shorten and path_parts.relative.shorten or path_parts.relative.path
-				result = filename
+				result = relative .. filename
 			elseif S.opt.filepath.path == "full" then
 				local full = S.opt.filepath.shorten and path_parts.full.shorten or path_parts.full.path
-				result = filename
+				result = full
 			end
 		end
-    -- print("meow")
-    -- print(result)
-		result = CE.el.truncate .. result
+		-- result = CE.el.truncate .. result
+		result = "%{expand('%:~:.')}"
+
 	end
 
 	local bufnr = UU.get_bufnr()
@@ -313,6 +315,7 @@ local function setup_autocmd(cb)
 	create_autocmd({
 		"BufWinEnter",
     "TextChanged",
+    "BufWrite",
     "TextChangedI",
 		"VimResized",
 		"WinClosed",

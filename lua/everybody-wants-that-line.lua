@@ -130,7 +130,7 @@ function M._set_statusline()
 	-- UNKNOWN
 	elseif wintype == "unknown" then
 		components = {
-			CE.spaced_text(CO.title([[¯\_(ツ)_/¯]]))
+			CE.spaced_text(CO.title([[✝]]))
 		}
 	end
 
