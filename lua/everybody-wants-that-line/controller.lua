@@ -170,7 +170,7 @@ function M.get_filepath()
 	local is_modifiable = vim.api.nvim_buf_get_option(bufnr, "mod") --[[@as boolean]]
 
 	if is_modifiable then
-    return "%#CurSearch#" .. result
+    return "%#ModifiedBuffer#" .. result
   else
     return result
   end
@@ -312,6 +312,8 @@ local function setup_autocmd(cb)
 	-- file name
 	create_autocmd({
 		"BufWinEnter",
+		"BufLeave",
+    "FocusLost",
     "TextChanged",
     "BufWrite",
     "TextChangedI",

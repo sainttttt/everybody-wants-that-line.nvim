@@ -141,9 +141,6 @@ end
 ---@param win_id number
 local function highlight_float(curwin_id, win_id)
 
-  if cache[curwin_id] == nil then
-    return
-  end
 	local bufnr = cache[win_id].buf_id
 	local is_modifiable = vim.api.nvim_buf_get_option(bufnr, "mod") --[[@as boolean]]
 
