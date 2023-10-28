@@ -15,6 +15,8 @@ local M = {}
 ---@type { [number]: filename_win_cache }
 local cache = {}
 
+local show_float = true
+
 local ns_id = vim.api.nvim_create_namespace(UU.prefix)
 
 ---Returns floating window config
@@ -82,6 +84,15 @@ end
 ---@param filename string
 local function create_float(win_id, filename)
 	local config = get_config(win_id, filename)
+
+  if not show_float then
+    return
+  end
+
+  if vim.api.nvim_win_get_config(win_id).relative == '' then
+    config["zindex"] = 30
+  end
+
 	local buf_id = vim.api.nvim_create_buf(false, true)
 	vim.api.nvim_buf_set_option(buf_id, "bufhidden", "wipe")
 	vim.api.nvim_buf_set_option(buf_id, "filetype", UU.prefix)
@@ -152,6 +163,24 @@ local function highlight_float(curwin_id, win_id)
 	vim.api.nvim_buf_clear_namespace(cache[win_id].float_buf_id, ns_id, 0, -1)
 	vim.api.nvim_buf_add_highlight(cache[win_id].float_buf_id, ns_id, hlgroup, 0, 0, #cache[win_id].filename + 2)
 	vim.api.nvim_buf_add_highlight(cache[win_id].float_buf_id, ns_id, hlgroup, 1, 0, #cache[win_id].filename + 2)
+end
+
+
+function M.toggle_float()
+  show_float = not show_float
+  print(show_float)
+
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local config = vim.api.nvim_win_get_config(win)
+    if config.relative ~= "" then
+      vim.api.nvim_win_close(win, false)
+    else
+      cache[win] = nil
+      -- cache[win]["float_buf_id"] = nil
+    end
+
+  end
+
 end
 
 ---Sets file name floating windows
