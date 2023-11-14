@@ -157,7 +157,9 @@ local function highlight_float(curwin_id, win_id)
 
   local hlgroup = C.group_names[curwin_id == win_id and "fg_bold" or "fg_60_bold"]
   if is_modifiable then
-    hlgroup = "CurSearch"
+    hlgroup = "FloatFilenameChange"
+  else
+    hlgroup = "FloatFilename"
   end
 
 	vim.api.nvim_buf_clear_namespace(cache[win_id].float_buf_id, ns_id, 0, -1)
@@ -166,22 +168,6 @@ local function highlight_float(curwin_id, win_id)
 end
 
 
-function M.toggle_float()
-  show_float = not show_float
-  print(show_float)
-
-  for _, win in ipairs(vim.api.nvim_list_wins()) do
-    local config = vim.api.nvim_win_get_config(win)
-    if config.relative ~= "" then
-      vim.api.nvim_win_close(win, false)
-    else
-      cache[win] = nil
-      -- cache[win]["float_buf_id"] = nil
-    end
-
-  end
-
-end
 
 ---Sets file name floating windows
 ---@param args event_args
@@ -223,6 +209,26 @@ function M.set_filename(args)
 			end
 		end
 	end)
+end
+
+function M.toggle_float()
+  show_float = not show_float
+
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local config = nil
+    if pcall( function() config = vim.api.nvim_win_get_config(win) end) then
+      if config.relative ~= "" then
+        vim.api.nvim_win_close(win, false)
+      else
+        cache[win] = nil
+        -- cache[win]["float_buf_id"] = nil
+      end
+    else
+      print("tete")
+    end
+
+  end
+  M.set_filename({event = "none"})
 end
 
 return M
