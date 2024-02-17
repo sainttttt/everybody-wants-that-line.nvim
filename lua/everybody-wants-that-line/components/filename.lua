@@ -30,21 +30,26 @@ local function get_config(win_id, filename)
 	local win_height = vim.api.nvim_win_get_height(win_id)
   local row_loc = 0
   local col_loc = win_width - 1
-  local zindex = 50
+  local zindex = 30
+  local win = win_id
+
+  local relative = "win"
   if vim.g.zen_opened then
     if vim.api.nvim_win_get_config(win_id).relative == '' then
-      row_loc = win_height / 2
-      col_loc = win_width / 2
+      row_loc = vim.o.lines / 2
+      col_loc = vim.o.columns / 2
+      relative = "editor"
+      win = nil
       zindex = 1
     else
-      zindex = 50
+      zindex = 42
     end
   else
-    zindex = 50
+    zindex = 42
   end
 	local config = {
-		relative = "win",
-		win = win_id,
+		relative = relative,
+		win = win,
 		anchor = "NE",
 		width = width + 2,
 		height = 2,
@@ -139,6 +144,7 @@ end
 local function move_float(win_id)
 	local config = get_config(win_id, cache[win_id].filename)
 	config.noautocmd = nil
+
 
 	vim.api.nvim_win_set_config(cache[win_id].float_win_id, config)
 end
