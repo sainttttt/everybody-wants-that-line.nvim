@@ -27,17 +27,33 @@ local function get_config(win_id, filename)
 	local width = #filename
 	width = width > 0 and width or 1
 	local win_width = vim.api.nvim_win_get_width(win_id)
+	local win_height = vim.api.nvim_win_get_height(win_id)
+  local row_loc = 0
+  local col_loc = win_width - 1
+  local zindex = 50
+  if vim.g.zen_opened then
+    if vim.api.nvim_win_get_config(win_id).relative == '' then
+      row_loc = win_height / 2
+      col_loc = win_width / 2
+      zindex = 1
+    else
+      zindex = 50
+    end
+  else
+    zindex = 50
+  end
 	local config = {
 		relative = "win",
 		win = win_id,
 		anchor = "NE",
 		width = width + 2,
 		height = 2,
-		row = 0,
-		col = win_width - 1,
+		row = row_loc,
+		col = col_loc,
 		focusable = false,
 		style = "minimal",
 		noautocmd = true,
+    zindex = zindex,
 	}
 	return config
 end
@@ -89,9 +105,6 @@ local function create_float(win_id, filename)
     return
   end
 
-  if vim.api.nvim_win_get_config(win_id).relative == '' then
-    config["zindex"] = 30
-  end
 
 	local buf_id = vim.api.nvim_create_buf(false, true)
 	vim.api.nvim_buf_set_option(buf_id, "bufhidden", "wipe")
@@ -126,6 +139,7 @@ end
 local function move_float(win_id)
 	local config = get_config(win_id, cache[win_id].filename)
 	config.noautocmd = nil
+
 	vim.api.nvim_win_set_config(cache[win_id].float_win_id, config)
 end
 
