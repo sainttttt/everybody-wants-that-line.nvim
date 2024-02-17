@@ -47,6 +47,7 @@ local function get_config(win_id, filename)
   else
     zindex = 42
   end
+  
 	local config = {
 		relative = relative,
 		win = win,
@@ -106,6 +107,10 @@ end
 local function create_float(win_id, filename)
 	local config = get_config(win_id, filename)
 
+  if config[zindex] == 1 then
+    return
+  end
+
   if not show_float then
     return
   end
@@ -143,9 +148,18 @@ end
 ---@param win_id number
 local function move_float(win_id)
 	local config = get_config(win_id, cache[win_id].filename)
+
+  if config.zindex == 1 then
+    local win_cache = cache[win_id]
+		if UU.is_win_valid(win_cache.float_win_id) then
+			vim.api.nvim_win_close(win_cache.float_win_id, false)
+			cache[win_cache.win_id] = nil
+      return
+		end
+  end
+
+
 	config.noautocmd = nil
-
-
 	vim.api.nvim_win_set_config(cache[win_id].float_win_id, config)
 end
 
@@ -171,6 +185,9 @@ end
 ---@param curwin_id number
 ---@param win_id number
 local function highlight_float(curwin_id, win_id)
+  if cache[win_id] == nil then
+    return
+  end
 
 	local bufnr = cache[win_id].buf_id
 	local is_modifiable = vim.api.nvim_buf_get_option(bufnr, "mod") --[[@as boolean]]
@@ -223,6 +240,8 @@ function M.set_filename(args)
 				if not UU.is_win_valid(cache[win_id].float_win_id) then
 					create_float(win_id, filepath.full.filename)
 				end
+
+        
 				update_filename(win_id, filepath.full.filename)
 				move_float(win_id)
 				highlight_float(curwin_id, win_id)
