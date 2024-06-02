@@ -42,12 +42,14 @@ local function get_config(win_id, filename)
       win = nil
       zindex = 1
     else
+      row_loc = vim.o.lines - 7
+      -- col_loc = vim.o.columns / 2
       zindex = 42
     end
   else
     zindex = 42
   end
-  
+
 	local config = {
 		relative = relative,
 		win = win,
@@ -241,7 +243,7 @@ function M.set_filename(args)
 					create_float(win_id, filepath.full.filename)
 				end
 
-        
+
 				update_filename(win_id, filepath.full.filename)
 				move_float(win_id)
 				highlight_float(curwin_id, win_id)
